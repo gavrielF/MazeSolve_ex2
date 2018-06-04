@@ -25,7 +25,8 @@ public class LineFollwer
 			//get low and high
 			getHighAndLow();
 			
-			contruller = _factoryControlls.getShape("PID_SONAR", s_low, s_high);
+			contruller = _factoryControlls.getShape("pid", s_low, s_high);
+		//	contruller = _factoryControlls.getShape("sensor_test", s_low, s_high);
 			
 			//while loop		
 			while (!Button.ESCAPE.isDown() && !Sensors.isExit())

@@ -1,5 +1,7 @@
 package com.robot;
 
+import com.logger.Logger;
+
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
@@ -12,6 +14,7 @@ public class Sensors
 	public static final UltrasonicSensor _sonarSensor = new UltrasonicSensor(SensorPort.S4);	
 	
 	public static final TouchSensor _touchSensor = new TouchSensor(SensorPort.S1);	
+	public static final TouchSensor _touchSensorWall = new TouchSensor(SensorPort.S2);	
 	
 	
 	public static int getLightSensorVal()
@@ -31,7 +34,13 @@ public class Sensors
 	
 	public static boolean isExit()
 	{
+		Logger.getInstance().logDebug("Exit button was press");
 		return _touchSensor.isPressed();
+	}
+	
+	public static boolean isWall()
+	{
+		return _touchSensorWall.isPressed();
 	}
 
 }

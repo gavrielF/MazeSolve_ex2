@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.logger.Logger;
 import com.robot.Motors;
 import com.robot.Sensors;
 import com.robot.TachoPose;
@@ -15,6 +16,7 @@ import com.robot.Utils;
 
 import lejos.nxt.LCD;
 import lejos.nxt.Sound;
+import lejos.util.Delay;
 import lejos.util.Stopwatch;
 
 //======================================================================
@@ -28,13 +30,13 @@ public class controllers
 	      {
 	         return null;
 	      }		
-	      if(shapeType.equalsIgnoreCase("PID_SONAR"))
+	      if(shapeType.equalsIgnoreCase("pid"))
 	      {
 	    	  return new PIDController(black, white); 
 	      }
-	      else if(shapeType.equalsIgnoreCase("PID-odey"))
+	      else if(shapeType.equalsIgnoreCase("sensor_test"))
 	      {
-	    	  return new PIDController(black, white); 
+	    	  return new sensor_test(); 
 	      } 
 	      
 	      return null;
@@ -45,14 +47,20 @@ public class controllers
 
 //======================================================================
 //======================================================================
-class lightMajer implements BaseController 
+class sensor_test implements BaseController 
 {
-	float sensorData;
+	int sensorData_sonar;
+	int sensorData_light;
 
-	public void run() {
+	public void run() 
+	{
 		LCD.clear();
-		sensorData = Sensors.getLightSensorVal();
-		LCD.drawString("majer: " + sensorData, 0, 2);
+		sensorData_light = Sensors.getLightSensorVal();
+		sensorData_sonar = Sensors.getSonarVal();
+		LCD.drawString("-------------------", 0, 1);
+		LCD.drawString("light: " + sensorData_light, 0, 2);
+		LCD.drawString("-------------------", 0, 3);
+		LCD.drawString("sonar: " + sensorData_sonar, 0, 4);
 		Utils.waitForEnter();
 	}
 
@@ -81,47 +89,71 @@ class PIDController implements BaseController
 	double derivative = 0;
 
 	int tp = 50;
+	
+	boolean inWall = false;
+	int powerAdd = 35;
+	int wallCount = 0;
 
 	private Motors motors = new Motors();
 
 	public PIDController(int black, int white) 
 	{
 		middle = (white + black) / 2;
-
+		Logger.getInstance().logDebug("PIDController middle is: " + middle);
 		double Kc = 250;
 		double pc = 0.2;
 		double dt = 0.020;
 
 		kp = (0.60) * (Kc);
-
 		ki = (2 * (kp) * (dt)) / (pc);
-
 		kd = ((kp) * (pc)) / ((8) * (dt));
+		
+		
 	}
 
 	public void run() 
-	{
-		sensorData = Sensors.getSonarVal();
+	{	
+		if(!inWall)
+		{
+			if(Sensors.isWall())
+			{
+				inWall = true;
+				restart();
+				return;
+			}
+			sensorData = Sensors.getSonarVal();
 
-		if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
-				|| (error < 0 && (middle - sensorData) > 0))
-			integral = 0;
-
-		error = middle - sensorData;
-
-		integral = (2/3) * integral + error;
-
-		derivative = error - lastError;
-
-		turn = (kp * error) + (ki * integral) + (kd * derivative);
-		turn = turn / 100;
-
-		leftSpeed = tp - turn;
-		rightSpeed = tp + turn;
-
-		motors.setPower(leftSpeed, rightSpeed);
-
-		lastError = error;
+			if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
+					|| (error < 0 && (middle - sensorData) > 0))
+				integral = 0;
+	
+			error = middle - sensorData;
+	
+			integral = (2/3) * integral + error;
+	
+			derivative = error - lastError;
+	
+			turn = (kp * error) + (ki * integral) + (kd * derivative);
+			turn = turn / 100;
+	
+			leftSpeed = tp + turn;
+			rightSpeed = tp - turn;
+	
+			motors.setPower(leftSpeed, rightSpeed);
+	
+			lastError = error;
+		}
+		else
+		{
+			Sound.beep();
+			motors.setPower(-40, -40);
+			Delay.msDelay(500);
+			motors.setPower(powerAdd, -powerAdd);
+			Delay.msDelay(200);
+			motors.setPower(0, 0);
+			inWall = false;
+		}
+		
 	}
 
 	@Override
@@ -129,6 +161,20 @@ class PIDController implements BaseController
 	{
 		motors.setPower(0, 0);
 	}
+	
+	private void restart()
+	{
+		kp = 0;
+		ki = 0;
+		kd = 0;
+		turn = 0;
+		error = 0;
+		integral = 0;
+		lastError = 0;
+		derivative = 0;
+	}
+
+	
 }
 
 //======================================================================
