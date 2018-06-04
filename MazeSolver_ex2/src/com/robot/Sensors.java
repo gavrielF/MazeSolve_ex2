@@ -6,6 +6,7 @@ import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
+import lejos.util.Delay;
 
 public class Sensors
 {
@@ -29,6 +30,8 @@ public class Sensors
 	
 	public static int getSonarVal()
 	{
+		//_sonarSensor.ping();
+		//Delay.msDelay(20);
 		return _sonarSensor.getDistance();
 	}
 	
