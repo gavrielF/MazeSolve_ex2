@@ -34,8 +34,12 @@ public class Sensors
 	
 	public static boolean isExit()
 	{
-		Logger.getInstance().logDebug("Exit button was press");
-		return _touchSensor.isPressed();
+		if(_touchSensor.isPressed())
+		{
+			Logger.getInstance().logDebug("Exit button was press");
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isWall()

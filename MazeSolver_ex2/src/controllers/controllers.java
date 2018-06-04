@@ -74,6 +74,8 @@ class sensor_test implements BaseController
 //======================================================================
 class PIDController implements BaseController
 {
+	MovePosition moveOdy;
+	
 	double leftSpeed, rightSpeed;
 	double integral = 0;
 
@@ -98,6 +100,8 @@ class PIDController implements BaseController
 
 	public PIDController(int black, int white) 
 	{
+		moveOdy = new MovePosition(motors, 100);
+		
 		middle = (white + black) / 2;
 		Logger.getInstance().logDebug("PIDController middle is: " + middle);
 		double Kc = 250;
@@ -113,6 +117,9 @@ class PIDController implements BaseController
 
 	public void run() 
 	{	
+		
+		moveOdy.doTask();
+		
 		if(!inWall)
 		{
 			if(Sensors.isWall())
@@ -160,6 +167,7 @@ class PIDController implements BaseController
 	public void finish() 
 	{
 		motors.setPower(0, 0);
+		moveOdy.printToFile();
 	}
 	
 	private void restart()
@@ -172,6 +180,8 @@ class PIDController implements BaseController
 		integral = 0;
 		lastError = 0;
 		derivative = 0;
+		
+		moveOdy.markRotation();
 	}
 
 	
@@ -213,6 +223,12 @@ class MovePosition
 			_listy.add(lastTachoPose.getY());
 			watch.reset();
 		}
+	}
+	
+	public void markRotation()
+	{
+		_listx.add(10111010f);
+		_listy.add(10111010f);
 	}
 
 	public void printToFile() 
