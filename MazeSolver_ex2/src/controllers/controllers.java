@@ -117,8 +117,8 @@ class PIDController implements BaseController
 
 	public void run() 
 	{	
-		
-		moveOdy.doTask();
+		sensorData = Sensors.getSonarVal();
+		moveOdy.doTask(sensorData);
 		
 		if(!inWall)
 		{
@@ -128,7 +128,7 @@ class PIDController implements BaseController
 				restart();
 				return;
 			}
-			sensorData = Sensors.getSonarVal();
+			
 
 			if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
 					|| (error < 0 && (middle - sensorData) > 0))
@@ -199,6 +199,7 @@ class MovePosition
 	
 	private List<Float> _listx = new ArrayList<Float>();
 	private List<Float> _listy = new ArrayList<Float>();
+	private List<Float> _listz = new ArrayList<Float>();
 	
 	private int _elapsed = 400;
 	
@@ -210,7 +211,7 @@ class MovePosition
 		_elapsed = elapsed;
 	}
 	
-	public void doTask()
+	public void doTask(float distance)
 	{
 		//update the current position
 		_motors.setPose(lastTachoPose);
@@ -221,6 +222,7 @@ class MovePosition
 			lastTachoPose = _motors.getPose();
 			_listx.add(lastTachoPose.getX());
 			_listy.add(lastTachoPose.getY());
+			_listz.add(distance);
 			watch.reset();
 		}
 	}
@@ -229,6 +231,7 @@ class MovePosition
 	{
 		_listx.add(10111010f);
 		_listy.add(10111010f);
+		_listz.add(0f);
 	}
 
 	public void printToFile() 
@@ -254,6 +257,8 @@ class MovePosition
 				dataStream.writeBytes(String.valueOf(_listx.get(i)));
 				dataStream.writeBytes(", ");
 				dataStream.writeBytes(String.valueOf(_listy.get(i)));
+				dataStream.writeBytes(", ");
+				dataStream.writeBytes(String.valueOf(_listz.get(i)));
 				dataStream.writeBytes("), ");
 				fileStream.flush();
 			} 
