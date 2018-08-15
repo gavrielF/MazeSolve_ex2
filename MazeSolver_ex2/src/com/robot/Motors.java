@@ -20,7 +20,6 @@ public class Motors
 		_leftMotor = new NXTMotor(MotorPort.C);
 		
 		lastTachoPose = new TachoPose();
-		
 	}
 	
 	public void setPower(double left, double right)
