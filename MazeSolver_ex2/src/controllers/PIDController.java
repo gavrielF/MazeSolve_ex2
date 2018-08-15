@@ -19,29 +19,29 @@ import lejos.nxt.Sound;
 import lejos.util.Delay;
 import lejos.util.Stopwatch;
 
-//======================================================================
-//======================================================================
-public class controllers 
-{
-	  
-	   public BaseController getShape(String shapeType, int black, int white)
-	   {
-	      if(shapeType == null)
-	      {
-	         return null;
-	      }		
-	      if(shapeType.equalsIgnoreCase("pid"))
-	      {
-	    	  return new PIDController(black, white); 
-	      }
-	      else if(shapeType.equalsIgnoreCase("sensor_test"))
-	      {
-	    	  return new sensor_test(); 
-	      } 
-	      
-	      return null;
-	   }
-}
+////======================================================================
+////======================================================================
+//public class controllers 
+//{
+//	  
+//	   public BaseController getShape(String shapeType, int black, int white)
+//	   {
+//	      if(shapeType == null)
+//	      {
+//	         return null;
+//	      }		
+//	      if(shapeType.equalsIgnoreCase("pid"))
+//	      {
+//	    	  return new PIDController(black, white); 
+//	      }
+//	      else if(shapeType.equalsIgnoreCase("sensor_test"))
+//	      {
+//	    	  return new sensor_test(); 
+//	      } 
+//	      
+//	      return null;
+//	   }
+//}
 
 
 
@@ -72,7 +72,7 @@ class sensor_test implements BaseController
 
 //======================================================================
 //======================================================================
-class PIDController implements BaseController
+public class PIDController implements BaseController
 {
 	MovePosition moveOdy;
 	
@@ -86,15 +86,19 @@ class PIDController implements BaseController
 	double kd = 0;
 	double turn = 0;
 	double error = 0;
+	
+	double Kc = 300;
+	double pc = 0.2;
+	double dt = 0.025;
 
 	double lastError = 0;
 	double derivative = 0;
 
-	int tp = 50;
+	int tp = 40;
 	
 	boolean inWall = false;
-	int powerAdd = 35;
-	int wallCount = 0;
+	
+	
 
 	private Motors motors = new Motors();
 
@@ -103,10 +107,9 @@ class PIDController implements BaseController
 		moveOdy = new MovePosition(motors, 100);
 		
 		middle = (white + black) / 2;
-		Logger.getInstance().logDebug("PIDController middle is: " + middle);
-		double Kc = 250;
-		double pc = 0.2;
-		double dt = 0.020;
+		if(middle < 10)
+			middle = 10;
+		Logger.getInstance().logDebug("PIDController middle is: " + middle);		
 
 		kp = (0.60) * (Kc);
 		ki = (2 * (kp) * (dt)) / (pc);
@@ -120,23 +123,14 @@ class PIDController implements BaseController
 		sensorData = Sensors.getSonarVal();
 		moveOdy.doTask(sensorData);
 		
-		if(!inWall)
-		{
-			if(Sensors.isWall())
-			{
-				inWall = true;
-				restart();
-				return;
-			}
-			
-
-			if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
+		
+		if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
 					|| (error < 0 && (middle - sensorData) > 0))
 				integral = 0;
 	
 			error = middle - sensorData;
 	
-			integral = (2/3) * integral + error;
+			integral = (1/3) * integral + error;
 	
 			derivative = error - lastError;
 	
@@ -149,17 +143,6 @@ class PIDController implements BaseController
 			motors.setPower(leftSpeed, rightSpeed);
 	
 			lastError = error;
-		}
-		else
-		{
-			Sound.beep();
-			motors.setPower(-40, -40);
-			Delay.msDelay(500);
-			motors.setPower(powerAdd, -powerAdd);
-			Delay.msDelay(200);
-			motors.setPower(0, 0);
-			inWall = false;
-		}
 		
 	}
 
@@ -170,11 +153,11 @@ class PIDController implements BaseController
 		moveOdy.printToFile();
 	}
 	
-	private void restart()
+	public void restart()
 	{
-		kp = 0;
-		ki = 0;
-		kd = 0;
+		kp = (0.60) * (Kc);
+		ki = (2 * (kp) * (dt)) / (pc);
+		kd = ((kp) * (pc)) / ((8) * (dt));
 		turn = 0;
 		error = 0;
 		integral = 0;
