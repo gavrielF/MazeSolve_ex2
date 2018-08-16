@@ -162,7 +162,7 @@ class Tasks_2 implements BaseTask
 		LCD.drawString("Tasks_2...", 0, 3);
 
 		//read the data from the file
-		//readfromfile();
+		readfromfile();
 		
 		//go to the begging
 		backtobegging();
@@ -221,7 +221,7 @@ class Tasks_2 implements BaseTask
 	       } 
 	       catch (IOException ioe) 
 	       {
-	         LCD.drawString("read exception", 0, 0);
+	        // LCD.drawString("read exception", 0, 0);
 	       }
 	       
 	       String content = strBuffer.toString();
@@ -230,9 +230,12 @@ class Tasks_2 implements BaseTask
 	       x = Integer.parseInt(content);
 	       y = Integer.parseInt(content2);
 	       
-	       LCD.drawInt(x, 0, 1);
-	       LCD.drawInt(y, 0, 2);
-	       Utils.waitForEnter();
+	     //  LCD.drawInt(x, 0, 1);
+	      // LCD.drawInt(y, 0, 2);
+	    //   Utils.waitForEnter();
+	       
+	       dist = y;
+	       degree = x;
 	}
 	
 	private void backtobegging()
@@ -245,16 +248,13 @@ class Tasks_2 implements BaseTask
 	{
 			Motors motors = new Motors();
 			
-			motors.setPower(60, 60);
-			Delay.msDelay(6 * 1000);
+			motors.setPower(60, 50);
+			Delay.msDelay(5 * 1000 + 500);
 			
 			motors.setPower(0,0);
 			
 			Tasks_3 t3 = new Tasks_3(Utils.calival);
-			t3.execute();
-			
-		
-		
+			t3.execute();						
 	}
 	
 	private void gotomiddle()
