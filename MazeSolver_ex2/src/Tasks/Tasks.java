@@ -36,7 +36,7 @@ public class Tasks {
 		} else if (taskType.equalsIgnoreCase("task2")) {
 			return new Tasks_2();
 		} else if (taskType.equalsIgnoreCase("task3")) {
-			return new Tasks_3();
+			return new Tasks_3(Utils.calival);
 		}
 
 		return null;
@@ -45,27 +45,30 @@ public class Tasks {
 
 class checkendLine {
 	private Stopwatch watch = new Stopwatch();
+	
+	private Stopwatch watch2 = new Stopwatch();
 	private int blackLine = 0;
 
 	public checkendLine() {
 		watch.reset();
 	}
 
-	public boolean check() {
+	public boolean check() 
+	{
 		// do every 200 ms
 		if (watch.elapsed() < 5000) {
 			return false;
 		}
 
-		LCD.drawString("checkendLine", 0, 3);
-		Utils.waitForEnter();
-
-		int color = new Integer(Sensors.getLightSensorVal());
-
-		if (color < 35)
-			blackLine++;
-
-		if (blackLine >= 1)
+		if(watch2.elapsed() > 500)
+		{
+			int color = new Integer(Sensors.getLightSensorVal());
+	
+			if (color < 35)
+				blackLine++;
+			watch2.reset();
+		}
+		if (blackLine >= 2)
 			return true;
 
 		return false;
@@ -105,8 +108,10 @@ class Tasks_1 implements BaseTask {
 			controllerl = new PIDController(calival.s_low, calival.s_high, _toOdy);
 
 			// while loop
-			while (!Button.ESCAPE.isDown() && !Sensors.isExit()) {
-				if (Sensors.isWall()) {
+			while (!Button.ESCAPE.isDown() && !Sensors.isExit()) 
+			{
+				if (Sensors.isWall()) 
+				{
 					wallCount++;
 					controllerl.restart();
 
@@ -133,7 +138,9 @@ class Tasks_1 implements BaseTask {
 
 			// finish the controller task
 			controllerl.finish();
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			Logger.getInstance().logDebug("main - end get exception: " + e.getMessage());
 		} 
 	}
@@ -141,8 +148,8 @@ class Tasks_1 implements BaseTask {
 
 class Tasks_2 implements BaseTask 
 {
-	private int degree = 45;
-	private int dist = 50;
+	private int degree = -30;
+	private int dist = 80;
 	
 	 private static final short [] note = {
 			    2349,115, 0,5, 1760,165, 0,35, 1760,28, 0,13, 1976,23, 
@@ -159,22 +166,30 @@ class Tasks_2 implements BaseTask
 		Utils.waitForEnter();
 
 		//read the data from the file
-		readfromfile();
+		//readfromfile();
 		
 		//go to the begging
-		//backtobegging();
+		backtobegging();
+		LCD.drawString("backtobegging end", 0, 3);
+		waitAndMakeNoise(); //wait 30 sec and wait for noise	
 		
-	//	waitAndMakeNoise(); //wait 30 sec and wait for noise	
 		
 		//go to the middle point
-		//gotomiddle();
+		gotomiddle();
 		
-		//waitAndMakeNoise(); //wait 30 sec and wait for noise
+		LCD.drawString("gotomiddle end", 0, 3);
 		
-		//go to the begging
-		//backtobegging();
+		waitAndMakeNoise(); //wait 30 sec and wait for noise
 		
-	//	waitAndMakeNoise(); //wait 30 sec and wait for noise
+	
+		gotowall();
+		LCD.drawString("gotowall end", 0, 3);
+				
+		LCD.drawString("backtobegging end", 0, 3);
+		
+		waitAndMakeNoise(); //wait 30 sec and wait for noise
+		
+		Utils.waitForEnter();
 		
 	}
 	
@@ -232,7 +247,7 @@ class Tasks_2 implements BaseTask
 		t1.execute();
 	}
 	
-	private void gotomiddle()
+	private void gotowall()
 	{
 		try
 		{
@@ -246,8 +261,36 @@ class Tasks_2 implements BaseTask
 	    	
 	        DifferentialPilot pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor, reverse);
 			
-			pilot.rotate(degree);
+	        pilot.rotate(-30);
 			pilot.travel(dist);
+				
+			
+			
+			Tasks_3 t3 = new Tasks_3(Utils.calival);
+			t3.execute();
+			
+		}
+		catch (IOException e) 
+		{
+			
+		}
+	}
+	
+	private void gotomiddle()
+	{
+		try
+		{
+			PilotProps pp = new PilotProps();
+	    	pp.loadPersistentValues();
+	    	float wheelDiameter = Float.parseFloat(pp.getProperty(PilotProps.KEY_WHEELDIAMETER, "4.32"));
+	    	float trackWidth = Float.parseFloat(pp.getProperty(PilotProps.KEY_TRACKWIDTH, "16.35"));
+	    	RegulatedMotor leftMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_LEFTMOTOR, "C"));
+	    	RegulatedMotor rightMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_RIGHTMOTOR, "B"));
+	    	
+	        DifferentialPilot pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor);
+	        
+			pilot.rotate(-35);
+			pilot.travel(80);
 		}
 		catch (IOException e) 
 		{
@@ -258,7 +301,7 @@ class Tasks_2 implements BaseTask
 	private void waitAndMakeNoise()
 	{
 		Sound.buzz();
-		Delay.msDelay(30 * 1000);
+		Delay.msDelay(5 * 1000);
 //		int val = 0;
 //		LCD.clear();
 //		LCD.drawString("start gg...", 0, 1);
@@ -278,14 +321,70 @@ class Tasks_2 implements BaseTask
 	}
 
 }
-
 class Tasks_3 implements BaseTask {
 
-	@Override
-	public void execute() {
+	private PIDController controllerl = null;
+	private caliVals _calival = null;
 
-		LCD.drawString("Tasks_3...", 0, 3);
-		Utils.waitForEnter();
+	private checkendLine lineChecker = null;
+	
+	private boolean _toOdy = false;
+
+	public Tasks_3(caliVals calival)
+	{
+		if(calival != null)
+			_calival = calival;
+		
+		else
+			_calival = new caliVals(6, 12);
+		
 	}
+	
+	
+	@Override
+	public void execute() 
+	{
+		lineChecker = new checkendLine();
 
+		Motors motors = new Motors();
+		int powerAdd = 40;
+		int wallCount = 0;
+
+		try 
+		{
+			controllerl = new PIDController(_calival.s_low, _calival.s_high, _toOdy);
+
+			// while loop
+			while (!Button.ESCAPE.isDown() && !Sensors.isExit()) {
+				if (Sensors.isWall()) {
+					wallCount++;
+					controllerl.restart();
+
+					motors.setPower(-40, -40);
+					Delay.msDelay(400);
+
+					motors.setPower(powerAdd + wallCount * 10, -powerAdd);
+					Delay.msDelay(250);
+
+					motors.setPower(powerAdd, powerAdd);
+					Delay.msDelay(350);
+
+					motors.setPower(0, 0);
+				} else {
+					wallCount = 0;
+					controllerl.run();
+				}
+
+				if (lineChecker.check()) {
+					break;
+				}
+
+			}
+
+			// finish the controller task
+			controllerl.finish();
+		} catch (Exception e) {
+			Logger.getInstance().logDebug("main - end get exception: " + e.getMessage());
+		} 
+	}
 }

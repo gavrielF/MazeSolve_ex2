@@ -6,6 +6,8 @@ import lejos.nxt.Sound;
 
 public class Utils
 {
+	public static caliVals calival = null;
+	
 	public static void waitForEnter()
 	{
 		try
@@ -43,7 +45,8 @@ public class Utils
 		LCD.drawString("Next..", 0, 5);
 		Utils.waitForEnter();
 		LCD.clear();
-		return new caliVals(low, high);
+		calival = new caliVals(low, high);
+		return calival;
 	}
 }
 

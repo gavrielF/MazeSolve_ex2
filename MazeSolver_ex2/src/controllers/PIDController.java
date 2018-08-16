@@ -94,7 +94,7 @@ public class PIDController implements BaseController
 	double lastError = 0;
 	double derivative = 0;
 
-	int tp = 40;
+	int tp = 55;
 	
 	boolean inWall = false;
 	boolean _doOdy = false;
