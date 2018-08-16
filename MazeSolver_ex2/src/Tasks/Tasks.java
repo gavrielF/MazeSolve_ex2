@@ -1,13 +1,10 @@
 package Tasks;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Documented;
 
 import com.logger.Logger;
 import com.robot.Motors;
@@ -18,14 +15,13 @@ import com.robot.caliVals;
 import controllers.PIDController;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
-import lejos.nxt.LCDOutputStream;
 import lejos.nxt.Sound;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.navigation.DifferentialPilot;
 import lejos.util.Delay;
 import lejos.util.PilotProps;
 import lejos.util.Stopwatch;
-import lejos.util.TextMenu;
+
 
 //======================================================================
 //======================================================================
