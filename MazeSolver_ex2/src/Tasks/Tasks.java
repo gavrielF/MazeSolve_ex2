@@ -51,21 +51,24 @@ class checkendLine {
 
 	public checkendLine() {
 		watch.reset();
+		watch2.reset();
 	}
 
 	public boolean check() 
 	{
 		// do every 200 ms
-		if (watch.elapsed() < 5000) {
+		if (watch.elapsed() < 5000) 
+		{
 			return false;
 		}
 
-		if(watch2.elapsed() > 500)
+		if(watch2.elapsed() > 200)
 		{
 			int color = new Integer(Sensors.getLightSensorVal());
 	
-			if (color < 35)
+			if (color <= 40)
 				blackLine++;
+			
 			watch2.reset();
 		}
 		if (blackLine >= 2)
@@ -135,6 +138,8 @@ class Tasks_1 implements BaseTask {
 				}
 
 			}
+			
+			motors.setPower(1, 1);
 
 			// finish the controller task
 			controllerl.finish();
@@ -170,27 +175,27 @@ class Tasks_2 implements BaseTask
 		
 		//go to the begging
 		backtobegging();
-		LCD.drawString("backtobegging end", 0, 3);
-		waitAndMakeNoise(); //wait 30 sec and wait for noise	
 		
+		LCD.clear();
+		LCD.drawString("backtobegging end", 0, 3);
+		waitAndMakeNoise(5); //wait 30 sec and wait for noise	
 		
 		//go to the middle point
 		gotomiddle();
 		
-		LCD.drawString("gotomiddle end", 0, 3);
-		
-		waitAndMakeNoise(); //wait 30 sec and wait for noise
-		
+		LCD.clear();
+		LCD.drawString("go to middle end", 0, 3);
+		waitAndMakeNoise(10); //wait 30 sec and wait for noise	
 	
 		gotowall();
-		LCD.drawString("gotowall end", 0, 3);
-				
-		LCD.drawString("backtobegging end", 0, 3);
-		
-		waitAndMakeNoise(); //wait 30 sec and wait for noise
+		LCD.clear();
+		LCD.drawString("go to wall end", 0, 3);
+			
+		LCD.clear();
+		LCD.drawString("end press enter", 0, 3);
+		waitAndMakeNoise(5); //wait 30 sec and wait for noise
 		
 		Utils.waitForEnter();
-		
 	}
 	
 	private void readfromfile()
@@ -249,79 +254,47 @@ class Tasks_2 implements BaseTask
 	
 	private void gotowall()
 	{
-		try
-		{
-			PilotProps pp = new PilotProps();
-	    	pp.loadPersistentValues();
-	    	float wheelDiameter = Float.parseFloat(pp.getProperty(PilotProps.KEY_WHEELDIAMETER, "4.32"));
-	    	float trackWidth = Float.parseFloat(pp.getProperty(PilotProps.KEY_TRACKWIDTH, "16.35"));
-	    	RegulatedMotor leftMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_LEFTMOTOR, "C"));
-	    	RegulatedMotor rightMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_RIGHTMOTOR, "B"));
-	    	boolean reverse = Boolean.parseBoolean(pp.getProperty(PilotProps.KEY_REVERSE,"false"));
-	    	
-	        DifferentialPilot pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor, reverse);
+			Motors motors = new Motors();
 			
-	        pilot.rotate(-30);
-			pilot.travel(dist);
-				
+			motors.setPower(60, 60);
+			Delay.msDelay(6 * 1000);
 			
+			motors.setPower(0,0);
 			
 			Tasks_3 t3 = new Tasks_3(Utils.calival);
 			t3.execute();
 			
-		}
-		catch (IOException e) 
-		{
-			
-		}
+		
+		
 	}
 	
 	private void gotomiddle()
 	{
-		try
-		{
-			PilotProps pp = new PilotProps();
-	    	pp.loadPersistentValues();
-	    	float wheelDiameter = Float.parseFloat(pp.getProperty(PilotProps.KEY_WHEELDIAMETER, "4.32"));
-	    	float trackWidth = Float.parseFloat(pp.getProperty(PilotProps.KEY_TRACKWIDTH, "16.35"));
-	    	RegulatedMotor leftMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_LEFTMOTOR, "C"));
-	    	RegulatedMotor rightMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_RIGHTMOTOR, "B"));
-	    	
-	        DifferentialPilot pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor);
-	        
-			pilot.rotate(-35);
-			pilot.travel(80);
-		}
-		catch (IOException e) 
-		{
+		//rotat
+			Motors motors = new Motors();		
+			motors.setPower(70, -20);
+			Delay.msDelay(600);
 			
-		}
+			//move forword
+			motors.setPower(60, 60);
+			Delay.msDelay(6 * 1000);
+		
+			motors.setPower(0,0);
 	}
 	
-	private void waitAndMakeNoise()
+	private void waitAndMakeNoise(int sec)
 	{
 		Sound.buzz();
-		Delay.msDelay(5 * 1000);
-//		int val = 0;
-//		LCD.clear();
-//		LCD.drawString("start gg...", 0, 1);
-//		Stopwatch watch = new Stopwatch();
-//		while (watch.elapsed() < 30  * 1000)
-//		{
-//			val = Sensors.getSoundVal();
-//			LCD.drawString("val = " + val, 0, 2);
-//			if(val >= 94)
-//			{
-//				LCD.drawString("breaing gg..." + val, 0, 3);
-//				Utils.waitForEnter();
-//				break;
-//			}
-//		}
+		
+		Sound.playSample(new File("Space_Alert3.wav"));
+		
+		Delay.msDelay(sec * 1000);
 				
 	}
 
 }
-class Tasks_3 implements BaseTask {
+class Tasks_3 implements BaseTask
+{
 
 	private PIDController controllerl = null;
 	private caliVals _calival = null;
