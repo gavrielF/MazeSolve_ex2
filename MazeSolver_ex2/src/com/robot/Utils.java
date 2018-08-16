@@ -33,15 +33,16 @@ public class Utils
 	public static caliVals getHighAndLow()
 	{
 		LCD.clear();
-		LCD.drawString("get low", 0, 2);
+		LCD.drawString("Get low", 0, 2);
 		Utils.waitForEnter();
 		int low = new Integer(Sensors.getSonarVal());
-		LCD.drawString("get high", 0, 3);
+		LCD.drawString("Get high", 0, 3);
 		Utils.waitForEnter();
 		int high = new Integer(Sensors.getSonarVal());
 		LCD.drawString("l:" + low + ", h:" + high, 0, 4);	
 		LCD.drawString("Next..", 0, 5);
-		Utils.waitForEnter();	
+		Utils.waitForEnter();
+		LCD.clear();
 		return new caliVals(low, high);
 	}
 }

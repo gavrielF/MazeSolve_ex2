@@ -1,5 +1,6 @@
 package com.start;
 
+import com.logger.Logger;
 import com.robot.Utils;
 import Tasks.BaseTask;
 import Tasks.Tasks;
@@ -19,21 +20,31 @@ public class LineFollwer
 	
 	public static void main(String[] args) 
 	{
-		
-		//select the flow
-		showOptions();	
-		LCD.clear();
-		
-		if(task != null)
-			task.execute();
-				
-		LCD.drawString("finish main...", 0, 6);
-		Utils.waitForEnter();		
+		try
+		{
+			//select the flow
+			showOptions();	
+			LCD.clear();
+			LCD.drawString("Start..", 0, 2);
+			Utils.waitForEnter();
+			if(task != null)
+				task.execute();
+					
+			LCD.drawString("finish main...", 0, 6);
+			Utils.waitForEnter();		
+		}
+		finally 
+		{
+			Logger.getInstance().write();
+		}
+	
 	}
 	
 
 	private static void showOptions()
-	{			
+	{	
+		Delay.msDelay(200);
+		
 		Button.RIGHT.addButtonListener(new ButtonListener() 
 		{
 			@Override
@@ -65,9 +76,6 @@ public class LineFollwer
 		showSelection(0);
 		
 		while (!Button.ENTER.isDown()) { }
-		
-		LCD.clear();
-		LCD.drawString("Start..", 0, 2);
 	}
 	
 	private static void showSelection(int i)

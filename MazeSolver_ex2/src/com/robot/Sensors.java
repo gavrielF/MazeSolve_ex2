@@ -4,6 +4,7 @@ import com.logger.Logger;
 
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
+import lejos.nxt.SoundSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.util.Delay;
@@ -14,7 +15,8 @@ public class Sensors
 	public static final LightSensor _lightSensor = new LightSensor(SensorPort.S3);
 	public static final UltrasonicSensor _sonarSensor = new UltrasonicSensor(SensorPort.S4);	
 	
-	public static final TouchSensor _touchSensor = new TouchSensor(SensorPort.S1);	
+	public static final SoundSensor sound = new SoundSensor(SensorPort.S1);
+	
 	public static final TouchSensor _touchSensorWall = new TouchSensor(SensorPort.S2);	
 	
 	
@@ -35,13 +37,16 @@ public class Sensors
 		return _sonarSensor.getDistance();
 	}
 	
+	public static int getSoundVal()
+	{
+		//_sonarSensor.ping();
+		//Delay.msDelay(20);
+		return sound.readValue();
+	}
+	
 	public static boolean isExit()
 	{
-		if(_touchSensor.isPressed())
-		{
-			Logger.getInstance().logDebug("Exit button was press");
-			return true;
-		}
+		
 		return false;
 	}
 	

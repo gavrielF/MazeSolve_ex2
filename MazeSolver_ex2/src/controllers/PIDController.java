@@ -97,13 +97,13 @@ public class PIDController implements BaseController
 	int tp = 40;
 	
 	boolean inWall = false;
+	boolean _doOdy = false;
 	
-	
-
 	private Motors motors = new Motors();
 
-	public PIDController(int black, int white) 
+	public PIDController(int black, int white, boolean doOdy) 
 	{
+		_doOdy = doOdy;
 		moveOdy = new MovePosition(motors, 100);
 		
 		middle = (white + black) / 2;
@@ -114,14 +114,14 @@ public class PIDController implements BaseController
 		kp = (0.60) * (Kc);
 		ki = (2 * (kp) * (dt)) / (pc);
 		kd = ((kp) * (pc)) / ((8) * (dt));
-		
-		
+				
 	}
 
 	public void run() 
 	{	
 		sensorData = Sensors.getSonarVal();
-		moveOdy.doTask(sensorData);
+		if(_doOdy)
+			moveOdy.doTask(sensorData);
 		
 		
 		if (middle == sensorData || (error > 0 && (middle - sensorData) < 0)
@@ -150,7 +150,8 @@ public class PIDController implements BaseController
 	public void finish() 
 	{
 		motors.setPower(0, 0);
-		moveOdy.printToFile();
+		if(_doOdy)
+			moveOdy.printToFile();
 	}
 	
 	public void restart()
@@ -164,7 +165,8 @@ public class PIDController implements BaseController
 		lastError = 0;
 		derivative = 0;
 		
-		moveOdy.markRotation();
+		if(_doOdy)
+			moveOdy.markRotation();
 	}
 
 	
