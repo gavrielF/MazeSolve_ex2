@@ -156,19 +156,10 @@ class Tasks_2 implements BaseTask
 	private int degree = -30;
 	private int dist = 80;
 	
-	 private static final short [] note = {
-			    2349,115, 0,5, 1760,165, 0,35, 1760,28, 0,13, 1976,23, 
-			    0,18, 1760,18, 0,23, 1568,15, 0,25, 1480,103, 0,18, 1175,180, 0,20, 1760,18, 
-			    0,23, 1976,20, 0,20, 1760,15, 0,25, 1568,15, 0,25, 2217,98, 0,23, 1760,88, 
-			    0,33, 1760,75, 0,5, 1760,20, 0,20, 1760,20, 0,20, 1976,18, 0,23, 1760,18, 
-			    0,23, 2217,225, 0,15, 2217,218};
-	
-	
 	@Override
 	public void execute() 
 	{
 		LCD.drawString("Tasks_2...", 0, 3);
-		Utils.waitForEnter();
 
 		//read the data from the file
 		//readfromfile();
@@ -178,14 +169,14 @@ class Tasks_2 implements BaseTask
 		
 		LCD.clear();
 		LCD.drawString("backtobegging end", 0, 3);
-		waitAndMakeNoise(5); //wait 30 sec and wait for noise	
+		waitAndMakeNoise(15,"startPoint.wav"); //wait 30 sec and wait for noise	
 		
 		//go to the middle point
 		gotomiddle();
 		
 		LCD.clear();
 		LCD.drawString("go to middle end", 0, 3);
-		waitAndMakeNoise(10); //wait 30 sec and wait for noise	
+		waitAndMakeNoise(15,"middlePoint.wav"); //wait 30 sec and wait for noise	
 	
 		gotowall();
 		LCD.clear();
@@ -193,9 +184,7 @@ class Tasks_2 implements BaseTask
 			
 		LCD.clear();
 		LCD.drawString("end press enter", 0, 3);
-		waitAndMakeNoise(5); //wait 30 sec and wait for noise
-		
-		Utils.waitForEnter();
+		waitAndMakeNoise(2,"endPoint.wav"); //wait 30 sec and wait for noise
 	}
 	
 	private void readfromfile()
@@ -282,13 +271,13 @@ class Tasks_2 implements BaseTask
 			motors.setPower(0,0);
 	}
 	
-	private void waitAndMakeNoise(int sec)
+	private void waitAndMakeNoise(int sec, String file_name)
 	{
 		Sound.buzz();
 		
-		Sound.playSample(new File("Space_Alert3.wav"));
+		Sound.playSample(new File(file_name),100);
 		
-		Delay.msDelay(sec * 1000);
+		Delay.msDelay(sec * 1000);		
 				
 	}
 
