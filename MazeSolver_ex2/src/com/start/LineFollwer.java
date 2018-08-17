@@ -25,7 +25,7 @@ public class LineFollwer
 			//select the flow
 			showOptions();	
 			LCD.clear();
-			LCD.drawString("Start..", 0, 2);
+			LCD.drawString("Start..", 0, 1);
 			Utils.waitForEnter();
 			if(task != null)
 				task.execute();

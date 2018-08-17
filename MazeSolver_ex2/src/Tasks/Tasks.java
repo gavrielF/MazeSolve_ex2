@@ -62,7 +62,7 @@ class checkendLine {
 			return false;
 		}
 
-		if(watch2.elapsed() > 200)
+		if(watch2.elapsed() > 150)
 		{
 			int color = new Integer(Sensors.getLightSensorVal());
 	
@@ -153,13 +153,14 @@ class Tasks_1 implements BaseTask {
 
 class Tasks_2 implements BaseTask 
 {
-	private int degree = -30;
-	private int dist = 80;
+	private int degree = 35;
+	private int dist = 100;
 	
 	@Override
 	public void execute() 
 	{
-		LCD.drawString("Tasks_2...", 0, 3);
+		LCD.clear();
+		LCD.drawString("Tasks_2...", 0, 2);
 
 		//read the data from the file
 		readfromfile();
@@ -260,15 +261,16 @@ class Tasks_2 implements BaseTask
 	private void gotomiddle()
 	{
 		//rotat
-			Motors motors = new Motors();		
-			motors.setPower(70, -20);
-			Delay.msDelay(600);
+		Motors motors = new Motors();		
+		motors.setPower(20 + degree, -20);
+		Delay.msDelay(600);
 			
-			//move forword
-			motors.setPower(60, 60);
-			Delay.msDelay(6 * 1000);
-		
-			motors.setPower(0,0);
+		//move forword
+		motors.setPower(35, 35);
+		int sec = dist / 10;
+		Delay.msDelay(sec * 1000);
+	
+		motors.setPower(0,0);
 	}
 	
 	private void waitAndMakeNoise(int sec, String file_name)
