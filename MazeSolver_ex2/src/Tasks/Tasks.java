@@ -170,14 +170,14 @@ class Tasks_2 implements BaseTask
 		
 		LCD.clear();
 		LCD.drawString("backtobegging end", 0, 3);
-		waitAndMakeNoise(15,"startPoint.wav"); //wait 30 sec and wait for noise	
+		waitAndMakeNoise(20,"startPoint.wav"); //wait 30 sec and wait for noise	
 		
 		//go to the middle point
 		gotomiddle();
 		
 		LCD.clear();
 		LCD.drawString("go to middle end", 0, 3);
-		waitAndMakeNoise(15,"middlePoint.wav"); //wait 30 sec and wait for noise	
+		waitAndMakeNoise(20,"middlePoint.wav"); //wait 30 sec and wait for noise	
 	
 		gotowall();
 		LCD.clear();
