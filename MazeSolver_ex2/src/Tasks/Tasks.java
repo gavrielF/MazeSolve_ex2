@@ -263,8 +263,8 @@ class Tasks_2 implements BaseTask
 		//rotat
 		Motors motors = new Motors();		
 		motors.setPower(20 + degree, -20);
-		Delay.msDelay(600);
-			
+		Delay.msDelay(550);
+
 		//move forword
 		motors.setPower(35, 35);
 		int sec = dist / 10;
@@ -277,10 +277,16 @@ class Tasks_2 implements BaseTask
 	{
 		Sound.buzz();
 		
-		Sound.playSample(new File(file_name),100);
+		Sound.playSample(new File(file_name),100);					
 		
-		Delay.msDelay(sec * 1000);		
-				
+		Stopwatch watch = new Stopwatch();
+		while(watch.elapsed() < sec * 1000)
+		{
+			int val = Sensors.getSonarVal();
+			if(val >= 50 && val <= 80)
+				break;
+		}
+		
 	}
 
 }
