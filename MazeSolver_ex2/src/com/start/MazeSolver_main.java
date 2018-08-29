@@ -11,7 +11,7 @@ import lejos.nxt.LCD;
 import lejos.nxt.Sound;
 import lejos.util.Delay;
 
-public class LineFollwer 
+public class MazeSolver_main 
 {
 
 	public static BaseTask task = null;
